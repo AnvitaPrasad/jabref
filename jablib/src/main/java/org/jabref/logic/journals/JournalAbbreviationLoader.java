@@ -35,23 +35,27 @@ public class JournalAbbreviationLoader {
     public static JournalAbbreviationRepository loadRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {
         JournalAbbreviationRepository repository;
 
-        // Initialize with built-in list
-        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv")) {
-            if (resourceAsStream == null) {
-                LOGGER.warn("There is no journal-list.mv. We use a default journal list.");
-                repository = new JournalAbbreviationRepository();
-            } else {
-                Path tempDir = Files.createTempDirectory("jabref-journal");
-                Path tempJournalList = tempDir.resolve("journal-list.mv");
-                Files.copy(resourceAsStream, tempJournalList);
-                repository = new JournalAbbreviationRepository(tempJournalList, loadLtwaRepository());
-                tempDir.toFile().deleteOnExit();
-                tempJournalList.toFile().deleteOnExit();
-                LOGGER.debug("Loaded journal abbreviations from {}", tempJournalList.toAbsolutePath());
+        if (!journalAbbreviationPreferences.shouldUseBuiltInList()) {
+            LOGGER.debug("Built-in journal abbreviation list is disabled by user preference.");
+            repository = new JournalAbbreviationRepository();
+        } else {
+            try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv")) {
+                if (resourceAsStream == null) {
+                    LOGGER.warn("There is no journal-list.mv. We use a default journal list.");
+                    repository = new JournalAbbreviationRepository();
+                } else {
+                    Path tempDir = Files.createTempDirectory("jabref-journal");
+                    Path tempJournalList = tempDir.resolve("journal-list.mv");
+                    Files.copy(resourceAsStream, tempJournalList);
+                    repository = new JournalAbbreviationRepository(tempJournalList, loadLtwaRepository());
+                    tempDir.toFile().deleteOnExit();
+                    tempJournalList.toFile().deleteOnExit();
+                    LOGGER.debug("Loaded journal abbreviations from {}", tempJournalList.toAbsolutePath());
+                }
+            } catch (IOException e) {
+                LOGGER.error("Error while loading journal abbreviation repository", e);
+                return null;
             }
-        } catch (IOException e) {
-            LOGGER.error("Error while loading journal abbreviation repository", e);
-            return null;
         }
 
         // Read external lists
@@ -90,6 +94,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new JournalAbbreviationPreferences(List.of(), true));
+        return loadRepository(new JournalAbbreviationPreferences(List.of(), true, true));
     }
 }

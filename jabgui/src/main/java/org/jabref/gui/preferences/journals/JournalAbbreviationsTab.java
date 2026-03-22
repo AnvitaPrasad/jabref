@@ -57,6 +57,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     @FXML private CustomTextField searchBox;
     @FXML private CheckBox useFJournal;
+    @FXML private CheckBox useBuiltInList;
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
@@ -133,6 +134,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
                 filteredAbbreviations.setPredicate(abbreviation -> searchTerm.isEmpty() || abbreviation.containsCaseIndependent(searchTerm)));
 
         useFJournal.selectedProperty().bindBidirectional(viewModel.useFJournalProperty());
+        useBuiltInList.selectedProperty().bindBidirectional(viewModel.useBuiltInListProperty());
     }
 
     private void setAnimations() {

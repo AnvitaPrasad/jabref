@@ -83,6 +83,10 @@
     </HBox>
 
     <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <CheckBox fx:id="useBuiltInList" text="%Use JabRef built-in journal abbreviation list"/>
+    </HBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="useFJournal" text="%Use the field FJournal to store the full journal name for (un)abbreviations in the entry"/>
     </HBox>
 </fx:root>

@@ -47,6 +47,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final SimpleBooleanProperty isEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty useFJournal = new SimpleBooleanProperty(true);
+    private final SimpleBooleanProperty useBuiltInList = new SimpleBooleanProperty(true);
 
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -107,6 +108,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     public void setValues() {
         journalFiles.clear();
 
+        useBuiltInList.set(abbreviationsPreferences.shouldUseBuiltInList());
         createFileObjects();
         selectLastJournalFile();
         addBuiltInList();
@@ -309,6 +311,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
                     abbreviationsPreferences.setExternalJournalLists(journalStringList);
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());
+                    abbreviationsPreferences.setUseBuiltInList(useBuiltInList.get());
 
                     if (shouldWriteLists) {
                         saveJournalAbbreviationFiles();
@@ -360,5 +363,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     public SimpleBooleanProperty useFJournalProperty() {
         return useFJournal;
+    }
+
+    public SimpleBooleanProperty useBuiltInListProperty() {
+        return useBuiltInList;
     }
 }

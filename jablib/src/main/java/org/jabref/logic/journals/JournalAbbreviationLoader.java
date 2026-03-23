@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.jabref.logic.journals.ltwa.LtwaRepository;
 
+import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,21 @@ public class JournalAbbreviationLoader {
 
         if (!journalAbbreviationPreferences.shouldUseBuiltInList()) {
             LOGGER.debug("Built-in journal abbreviation list is disabled by user preference.");
-            repository = new JournalAbbreviationRepository();
+            try {
+                Path tempDir = Files.createTempDirectory("jabref-journal-empty");
+                Path emptyJournalList = tempDir.resolve("journal-list.mv");
+                // Write an empty MV store so the repository has no built-in entries
+                try (MVStore store = new MVStore.Builder()
+                        .fileName(emptyJournalList.toAbsolutePath().toString()).open()) {
+                    store.openMap("FullToAbbreviation");
+                }
+                repository = new JournalAbbreviationRepository(emptyJournalList, loadLtwaRepository());
+                tempDir.toFile().deleteOnExit();
+                emptyJournalList.toFile().deleteOnExit();
+            } catch (IOException e) {
+                LOGGER.error("Error while creating empty journal abbreviation repository", e);
+                return null;
+            }
         } else {
             try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv")) {
                 if (resourceAsStream == null) {

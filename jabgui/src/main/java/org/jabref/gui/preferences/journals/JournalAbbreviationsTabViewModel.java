@@ -109,6 +109,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         journalFiles.clear();
 
         useBuiltInList.set(abbreviationsPreferences.shouldUseBuiltInList());
+        useFJournal.set(abbreviationsPreferences.shouldUseFJournalField());
         createFileObjects();
         selectLastJournalFile();
         addBuiltInList();

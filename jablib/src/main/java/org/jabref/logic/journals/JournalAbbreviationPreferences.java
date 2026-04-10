@@ -21,6 +21,24 @@ public class JournalAbbreviationPreferences {
         this.useBuiltInList = new SimpleBooleanProperty(useBuiltInList);
     }
 
+    private JournalAbbreviationPreferences() {
+        this(
+                List.of(), // externalJournalLists
+                true,      // useFJournalField
+                true       // useBuiltInList
+        );
+    }
+
+    public void setAll(JournalAbbreviationPreferences preferences) {
+        this.externalJournalLists.setAll(preferences.externalJournalLists);
+        this.useFJournalField.set(preferences.shouldUseFJournalField());
+        this.useBuiltInList.set(preferences.shouldUseBuiltInList());
+    }
+
+    public static JournalAbbreviationPreferences getDefault() {
+        return new JournalAbbreviationPreferences();
+    }
+
     public ObservableList<String> getExternalJournalLists() {
         return externalJournalLists;
     }

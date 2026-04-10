@@ -306,8 +306,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void updateHorizontalDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            horizontalSplit.setDividerPositions(preferences.getGuiPreferences()
-                                                           .getHorizontalDividerPosition() / horizontalSplit.getWidth());
+            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
             horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
                                                     .mapObservable(SplitPane.Divider::positionProperty)
                                                     .listenToValues((_, newValue) ->
@@ -483,6 +482,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // Hide tab bar
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
         tabbedPane.getTabs().addListener((ListChangeListener<Tab>) _ -> updateTabBarVisible());
+        preferences.getWorkspacePreferences().hideTabBarProperty().addListener((_, _, _) -> updateTabBarVisible());
 
         stateManager.canGoBackProperty().bind(
                 stateManager.activeTabProperty().flatMap(
@@ -609,6 +609,16 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                             LibraryTab currentTab = getCurrentLibraryTab();
                             return (currentTab == null) ? null : currentTab.getBibDatabaseContext();
                         }, stateManager, preferences, dialogService)),
+                factory.createMenuItem(StandardActions.SORT_TABS_ALPHABETICALLY, new SimpleCommand() {
+                    @Override
+                    public void execute() {
+                        tabbedPane.getTabs().sort((tab1, tab2) -> {
+                            String text1 = tab1.getText() != null ? tab1.getText() : "";
+                            String text2 = tab2.getText() != null ? tab2.getText() : "";
+                            return text1.compareToIgnoreCase(text2);
+                        });
+                    }
+                }),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY,
                         new CloseDatabaseAction(this, tab, stateManager)),
